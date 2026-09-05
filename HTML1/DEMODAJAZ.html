@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De Moda Jaz | Boutique La Paz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --guindo: #2b0101;
+            --oro: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --oro-solido: #d4af37;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--guindo);
+            background-image: 
+                linear-gradient(rgba(43, 1, 1, 0.94), rgba(43, 1, 1, 0.94)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='%23d4af37' fill-opacity='0.08'%3E%3Cpath d='M50 50c0-15 10-25 25-25s25 10 25 25-10 25-25 25-25-10-25-25zm-50 0c0-15 10-25 25-25s25 10 25 25-10 25-25 25-25-10-25-25zM25 0c0 15 10 25 25 25s25-10 25-25-10-25-25-25-25 10-25 25zM25 100c0-15 10-25 25-25s25 10 25 25-10 25-25 25-25-10-25-25z'/%3E%3C/g%3E%3C/svg%3E");
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .gold-text { font-family: 'Cinzel Decorative', cursive; background: var(--oro); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shine 5s linear infinite; }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        header { padding: 60px 20px; text-align: center; border-bottom: 1px solid var(--oro-solido); background: rgba(0,0,0,0.4); }
+        .cart-btn { position: fixed; top: 20px; right: 20px; background: var(--oro); padding: 15px 25px; color: #000; font-weight: 700; z-index: 1000; cursor: pointer; box-shadow: 0 0 15px rgba(212,175,55,0.5); }
+        .container { max-width: 1400px; margin: 40px auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); padding: 20px; text-align: center; position: relative; transition: 0.4s; }
+        .card.sold-out { opacity: 0.5; filter: grayscale(1); }
+        .sold-out-tag { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: #ff0000; color: white; padding: 10px 20px; font-weight: 900; z-index: 10; border: 2px solid white; font-family: 'Cinzel Decorative'; }
+        .card img { width: 100%; height: 450px; object-fit: cover; margin-bottom: 15px; border: 1px solid rgba(212,175,55,0.1); cursor: pointer; }
+        .size-select { width: 100%; padding: 12px; background: var(--guindo); border: 1px solid var(--oro-solido); color: white; margin-bottom: 15px; cursor: pointer; }
+        .price { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--oro-solido); margin: 10px 0; }
+        .btn-action { background: var(--oro); border: none; padding: 15px; width: 100%; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* Overlays */
+        .step-overlay, .details-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--guindo); z-index: 2000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .active { display: flex; }
+        .modal-content { background: rgba(0,0,0,0.85); border: 2px solid var(--oro-solido); padding: 40px; width: 100%; max-width: 600px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 1px solid var(--oro-solido); color: white; font-family: 'Montserrat'; }
+        .qr-frame { background: white; padding: 10px; width: 220px; margin: 15px auto; border: 4px solid #742261; border-radius: 8px; }
+        .wa-final-btn { background: #25D366; color: white; padding: 20px; text-decoration: none; display: block; font-weight: 800; margin-top: 15px; text-align: center; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="cart-btn" onclick="openStep(1)">👜 MI BOLSA (<span id="cart-count">0</span>)</div>
+
+<header>
+    <h1 class="gold-text" style="font-size: 4rem;">De Moda Jaz</h1>
+    <p style="letter-spacing: 10px; color: var(--oro-solido);">ALTA COSTURA • LA PAZ</p>
+</header>
+
+<div class="container">
+    <div class="grid" id="catalog"></div>
+</div>
+
+<!-- MODAL DETALLES VESTIDO -->
+<div id="details-modal" class="details-overlay">
+    <div class="modal-content">
+        <h2 id="d-name" class="gold-text" style="font-size: 2rem; margin-bottom: 20px;"></h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <img id="d-img-f" src="" style="width:100%; height:200px; object-fit:cover;">
+            <img id="d-img-b" src="" style="width:100%; height:200px; object-fit:cover;">
+            <img id="d-img-s" src="" style="width:100%; height:200px; object-fit:cover;">
+        </div>
+        <p style="margin-bottom: 20px; line-height: 1.6;">Este modelo exclusivo de alta costura destaca por su corte elegante. Disponible en tallas seleccionadas.</p>
+        <button class="btn-action" onclick="closeAll()">Cerrar</button>
+    </div>
+</div>
+
+<!-- PASOS 1, 2, 3 (Iguales a tu código) -->
+<div id="step-1" class="step-overlay"><div class="modal-content"><h2 class="gold-text">Tu Selección</h2><div id="cart-items"></div><div style="font-size: 2rem; text-align: right; color: var(--oro-solido); margin: 20px 0;">Total: <span id="total-bs">0</span> Bs</div><button class="btn-action" onclick="openStep(2)">Siguiente</button><p onclick="closeAll()" style="margin-top:20px; text-align:center; cursor:pointer;">← Seguir viendo</p></div></div>
+<div id="step-2" class="step-overlay"><div class="modal-content"><h2 class="gold-text">Tus Datos</h2><form onsubmit="event.preventDefault(); saveUserData(); openStep(3);"><input type="text" id="cust-name" placeholder="Nombre" required><input type="email" id="cust-email" placeholder="Email" required><input type="tel" id="cust-phone" placeholder="Celular" required><button type="submit" class="btn-action">Ir al Pago</button></form></div></div>
+<div id="step-3" class="step-overlay"><div class="modal-content" style="text-align: center;"><h2 class="gold-text">Pago Yape</h2><div class="qr-frame"><img src="mi-qr-yape.jpeg" style="width:100%;"></div><p style="color:var(--oro-solido);">Total: <span id="final-total">0</span> Bs</p><a id="wa-link" href="#" target="_blank" class="wa-final-btn">ENVIAR POR WHATSAPP</a></div></div>
+
+<script>
+    const dresses = [
+        { id: 1, name: "Gala Imperial", price: 150, img: "vestido1.jpg", stock: { XS: 5, S: 5, M: 5 } },
+        { id: 2, name: "Seda Illimani", price: 145, img: "vestido2.jpg", stock: { XS: 3, S: 3, M: 3 } },
+        { id: 3, name: "Vino de Altura", price: 135, img: "vestido3.jpg", stock: { XS: 2, S: 2, M: 2 } },
+        { id: 4, name: "Damasco Real", price: 120, img: "vestido4.jpg", stock: { XS: 4, S: 4, M: 4 } },
+        { id: 5, name: "Noche Paceña", price: 110, img: "vestido5.jpg", stock: { XS: 1, S: 1, M: 1 } },
+        { id: 6, name: "Terciopelo Guindo", price: 95, img: "vestido6.jpg", stock: { XS: 6, S: 6, M: 6 } },
+        { id: 7, name: "Aura Gold", price: 85, img: "vestido7.jpg", stock: { XS: 2, S: 2, M: 2 } },
+        { id: 8, name: "Esencia Wine", price: 75, img: "vestido8.jpg", stock: { XS: 3, S: 3, M: 3 } },
+        { id: 9, name: "Clásico Modest", price: 60, img: "vestido9.jpg", stock: { XS: 5, S: 5, M: 5 } },
+        { id: 10, name: "Elegance Soft", price: 50, img: "vestido10.jpg", stock: { XS: 4, S: 4, M: 4 } },
+        { id: 11, name: "Rosa de Invierno", price: 40, img: "vestido11.jpg", stock: { XS: 2, S: 2, M: 2 } },
+        { id: 12, name: "Sencillez Oro", price: 30, img: "vestido12.jpg", stock: { XS: 10, S: 10, M: 10 } }
+    ];
+
+    let cart = [];
+    let userData = {};
+
+    function render() {
+        const catalog = document.getElementById('catalog');
+        dresses.forEach(d => {
+            catalog.innerHTML += `
+                <div class="card">
+                    <img src="${d.img}" onclick="viewDetails(${d.id})" alt="${d.name}">
+                    <p style="font-family:'Playfair Display'; font-weight: bold;">${d.name}</p>
+                    <select class="size-select" id="size-${d.id}">${Object.keys(d.stock).map(s => `<option value="${s}">Talla ${s}</option>`).join('')}</select>
+                    <p class="price">${d.price} Bs</p>
+                    <button class="btn-action" onclick="addToCart(${d.id})">Añadir</button>
+                </div>
+            `;
+        });
+    }
+
+    function viewDetails(id) {
+        const d = dresses.find(x => x.id === id);
+        document.getElementById('d-name').innerText = d.name;
+        document.getElementById('d-img-f').src = d.img;
+        document.getElementById('d-img-b').src = d.img.replace('.jpg', '-back.jpg');
+        document.getElementById('d-img-s').src = d.img.replace('.jpg', '-side.jpg');
+        document.getElementById('details-modal').classList.add('active');
+    }
+
+    function addToCart(id) {
+        const d = dresses.find(x => x.id === id);
+        const size = document.getElementById(`size-${id}`).value;
+        cart.push({...d, size: size});
+        document.getElementById('cart-count').innerText = cart.length;
+        alert(`${d.name} añadido.`);
+    }
+
+    function openStep(step) {
+        closeAll();
+        if(step === 1) {
+            const list = document.getElementById('cart-items');
+            list.innerHTML = cart.map(i => `<p>• ${i.name} (${i.size}) - ${i.price} Bs</p>`).join('');
+            document.getElementById('total-bs').innerText = cart.reduce((a,b) => a + b.price, 0);
+        }
+        if(step === 3) {
+            const total = cart.reduce((a, b) => a + b.price, 0);
+            document.getElementById('final-total').innerText = total;
+            document.getElementById('wa-link').href = `https://wa.me/59161200117?text=Pedido de ${document.getElementById('cust-name').value}`;
+        }
+        document.getElementById(`step-${step}`).classList.add('active');
+    }
+
+    function saveUserData() { userData = { name: document.getElementById('cust-name').value }; }
+    function closeAll() { document.querySelectorAll('.step-overlay, .details-overlay').forEach(s => s.classList.remove('active')); }
+
+    render();
+</script>
+</body>
+</html>
+
+
+    
